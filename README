@@ -1,0 +1,35 @@
+Task
+The task is to develop a python command line tool that takes the architecture as
+an argument and outputs and downloads the compressed Contents file associated with
+it from a Debian mirror. The program should parse the file and output the statistics
+of the top 10 packages that have the most files associated with them.
+
+Initial thoughts
+Below are my initial thoughts on how to approach the problem, there may be changes
+when starting to implement
+
+- Downloader function to download the Contents file from debian mirror
+    - takes url of the debian mirror
+    - takes path to save the downloaded mirror
+    - download can be done in chunks of size 1MB
+    - downloading in chunks is not absolutely necessary since the content file size is
+      only around 10 mb, but it is a good practice to download in chunks
+    - Should handle invalid url, network errors
+- Parser class for parsing the downloaded content file
+    - takes the path where file was downloaded
+    - Content file structure consists of zero or more lines of free form text followed by Table
+        - the free form text can be ignored
+        - the first row can be identified by checking for FILE and LOCATION
+        - each table entry consists of filename followed by list of qualified package names
+        - qualified package name has the form [[$AREA/]$SECTION/]$NAME where $AREA is deprecated
+    - Creates a dictionary of package name as key and number of files as value
+        - iterate over the rows of table
+        - increment file count by 1 for each package in the list of each file.
+    - Get the top k packages with most files.
+        - use heap data structure to find the top k  packages with most files
+        - create a list of tuples of the form (# of files, package)
+        - heapify the list on # of files. This can be done in log(n) complexity
+        - pop the top element k times. this can be done in k log(n) complexity
+        - heap is best suited since we are interested in just the top 10 elements
+          and not sorting the entire list which has n log(n) complexity.
+
