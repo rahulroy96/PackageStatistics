@@ -24,7 +24,7 @@ def test_download_file_success():
     assert result, True
     with open(GZ_FILE_NAME, 'rb') as f:
         content = f.read()
-    assert content, FILE_CONTENT
+    assert content == FILE_CONTENT
     assert os.path.isfile(GZ_FILE_NAME)
     os.remove(GZ_FILE_NAME)
 
@@ -54,7 +54,7 @@ def test_unzip_gz_file_success(mock_isfile):
     assert result, True
     with open(FILE_NAME, 'rb') as f:
         content = f.read()
-    assert content, FILE_CONTENT
+    assert content == FILE_CONTENT
     assert os.path.isfile(FILE_NAME)
     os.remove(FILE_NAME)
 
