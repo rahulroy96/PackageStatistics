@@ -2,6 +2,8 @@
 
 import os
 import requests
+import shutil
+import gzip
 
 
 def download_file(file_url: str, file_name: str, chunk_size=1024 * 1024):
@@ -32,3 +34,29 @@ def download_file(file_url: str, file_name: str, chunk_size=1024 * 1024):
         print(f"Downloaded {file_name} successfully.")
 
     return os.path.isfile(file_name)  # Returns true if the file was downloaded successfully
+
+
+def unzip_gz_file(gz_file_path, output_file):
+    """
+    Unzips the gzip file to the specified directory
+    :param gz_file_path: The path to the file which is to be unzipped
+    :param output_file: The path where the file is to be saved
+    :return: True if the file was unzipped successfully
+    """
+    # Check that the input file is a .gz file
+    if not gz_file_path.endswith('.gz'):
+        raise ValueError('file is not a .gz file')
+
+    # Check that the input file exists
+    if not os.path.isfile(gz_file_path):
+        raise FileNotFoundError(f'File not found: {gz_file_path}')
+
+    try:
+        # Open the .gz file for reading and the output file for writing
+        with gzip.open(gz_file_path, 'rb') as gz_file, open(output_file, 'wb') as out_file:
+            # Read the contents of the .gz file and write them to the output file
+            shutil.copyfileobj(gz_file, out_file)  # Shuttle allows copy without loading the entire file
+    except Exception as e:
+        raise Exception(f'Error unzipping file {gz_file_path}: {str(e)}')
+
+    return os.path.isfile(output_file)
