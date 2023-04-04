@@ -38,7 +38,6 @@ class ContentsParser:
                         table_started = True
                     continue
 
-                file = left
                 # Once the table starts the right value contains list of qualified package names, separated by comma.
                 qualified_package_names = right.split(',')
 
@@ -46,7 +45,7 @@ class ContentsParser:
                     # A qualified package name has the form [[$AREA/]$SECTION/]$NAME, where $AREA is the archive area,
                     # $SECTION the package section, and $NAME the name of the package.
                     _, _, package_name = qualified_package_name.rpartition('/')
-                    files_list_per_package[package_name].append(file)  # Append file to file list of the package
+                    files_list_per_package[package_name].append(left)  # Append left to file list of the package
 
         if self.table_header and not table_started:
             # The table header containing FILE LOCATION was not detected in the file even though table header exists

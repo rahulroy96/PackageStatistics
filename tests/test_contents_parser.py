@@ -34,7 +34,7 @@ def mock_parse_file(*_):
 
 def test_top_k_packages_max_files_successful():
     # mock the parse file function and check if the top k function is working
-    with mock.patch.object(ContentsParser, 'parse_file', new=mock_parse_file):
+    with mock.patch.object(ContentsParser, 'get_files_list_per_package', new=mock_parse_file):
         content_parser = ContentsParser("file_path")
         top_k = content_parser.top_k_packages_max_files(2)
         assert len(top_k), 2
@@ -44,7 +44,7 @@ def test_top_k_packages_max_files_successful():
 def test_top_k_packages_max_files_k_greater_than_files_successful():
     # mock the parse file function and check if the top k function is working
     # with k greater than the # of packages
-    with mock.patch.object(ContentsParser, 'parse_file', new=mock_parse_file):
+    with mock.patch.object(ContentsParser, 'get_files_list_per_package', new=mock_parse_file):
         content_parser = ContentsParser("file_path")
         top_k = content_parser.top_k_packages_max_files(5)
         assert len(top_k) == 4
