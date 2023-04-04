@@ -57,7 +57,7 @@ def test_parse_file_without_header_successful():
     # Header row is the line containing value "FILE LOCATION".
     # Call the parse_file function to get the returned files_list_per_package
     content_parser = ContentsParser("file_path", table_header=False)
-    files_list_per_package_returned = content_parser.parse_file()
+    files_list_per_package_returned = content_parser.get_files_list_per_package()
 
     # assert that the returned dict is as expected
     assert files_list_per_package_returned["package1"] == ['file1', 'file2']
@@ -70,7 +70,7 @@ def test_parse_file_with_header_successful():
     # Header row is the line containing value "FILE LOCATION".
     # Call the parse_file function to get the returned files_list_per_package
     content_parser = ContentsParser("file_path", table_header=True)
-    files_list_per_package_returned = content_parser.parse_file()
+    files_list_per_package_returned = content_parser.get_files_list_per_package()
 
     # assert that the returned dict is same as the original
     assert files_list_per_package_returned["package1"] == ['file1', 'file2']
@@ -83,4 +83,4 @@ def test_parse_file_with_header_invalid_format():
     with pytest.raises(InvalidContentFileFormat):
         # Call the parse_file function to get the returned files_list_per_package
         content_parser = ContentsParser("file_path", table_header=True)
-        _ = content_parser.parse_file()
+        _ = content_parser.get_files_list_per_package()

@@ -4,12 +4,12 @@ File format can be found t https://wiki.debian.org/RepositoryFormat#A.22Contents
 import gzip
 from collections import defaultdict
 from heapq import heapify, heappop
-# from exceptions import InvalidContentFileFormat
 
 
 class InvalidContentFileFormat(Exception):
     """Raise if the format of the contents file is not correct"""
     pass
+
 
 class ContentsParser:
 
@@ -17,7 +17,7 @@ class ContentsParser:
         self.filepath = filepath  # The path to the file that is to be parsed
         self.table_header = table_header
 
-    def parse_file(self):
+    def get_files_list_per_package(self) -> defaultdict:
         """
         Parse the contents file and create a dictionary of package -> list of files
         :return: the dictionary containing package -> list of files mappings
@@ -61,7 +61,7 @@ class ContentsParser:
         :return: A list (package_name, number of files) containing the k top packages
         """
         # parse the file to create the files_list_per_package dictionary
-        files_list_per_package = self.parse_file()
+        files_list_per_package = self.get_files_list_per_package()
 
         # Convert the dictionary to list of tuples of the form (# of files, package name)
         # negate the number of files since we are going to use max heap
@@ -71,8 +71,7 @@ class ContentsParser:
         heapify(files_per_package_count_list)  # Heapify the list of tuples
 
         top_k = []
-        # top k packages can be found by poping from the heap k times
-        for _ in range(k):
+        for _ in range(k):  # top k packages can be found by calling heappop() on the heap k times
             if files_per_package_count_list:
                 top = heappop(files_per_package_count_list)
                 top_k.append((top[1], -top[0]))
