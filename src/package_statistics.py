@@ -6,7 +6,7 @@ that have the most files associated with them"""
 import click
 import os
 from utils import download_file
-from constants import DOWNLOAD_FOLDER, URL_BASE, CHUNK_SIZE
+from constants import DOWNLOAD_FOLDER, URL_BASE, CHUNK_SIZE, FILE_NAME_FORMAT
 from contents_parser import ContentsParser
 
 
@@ -18,15 +18,14 @@ def package_statistics(architecture, force):
     if not os.path.exists(DOWNLOAD_FOLDER):
         os.mkdir(DOWNLOAD_FOLDER)
 
-    gz_filename = f'Contents-{architecture}.gz'  # Form the filename by adding the architecture with file prefix
+    gz_filename = FILE_NAME_FORMAT.format(architecture)  # Form the filename by adding the architecture with file prefix
     gz_filepath = os.path.join(DOWNLOAD_FOLDER, gz_filename)
     url = f'{URL_BASE}{gz_filename}'  # Form the url by adding the filename with the base url
 
     # Download the file again only is the file not present locally or if the force option is set
     if os.path.isfile(gz_filepath) and not force:
-        click.echo(f"Using the local copy of the file")
+        click.echo(f"Using the local copy of the file - {gz_filename}")
     else:
-        click.echo(f"Downloading the contents file for {architecture}.")
         click.echo(f"Downloading {gz_filename} from {url}")
         download_file(url, gz_filepath, CHUNK_SIZE)  # Download the file
 
