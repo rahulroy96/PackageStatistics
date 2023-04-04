@@ -4,10 +4,6 @@ from src.constants import K_VALUE
 from requests.exceptions import HTTPError, ConnectionError
 
 
-def mock_top_k_packages_max_files(*_):
-    return [('package1', 2), ('package2', 1)]
-
-
 @patch('src.package_statistics.download_file')
 @patch('os.path.isfile')
 def test_package_statistics_using_local(mock_isfile, mock_download_file):
@@ -16,14 +12,18 @@ def test_package_statistics_using_local(mock_isfile, mock_download_file):
     mock_download_file.return_value = True
 
     with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
-        mock_top_k_packages_max_files.return_value = [('package1', 2), ('package2', 1)]
+        top_k_return_value = [('package1', 2), ('package2', 1)]
+        mock_top_k_packages_max_files.return_value = top_k_return_value
         runner = CliRunner()
         result = runner.invoke(package_statistics.package_statistics, ['arm64'])
         mock_download_file.assert_not_called()
         mock_top_k_packages_max_files.assert_called_once_with(K_VALUE)
         assert result.exit_code == 0
         assert "Using the local" in result.output
-        assert '1. package1' in result.output
+        assert top_k_return_value[0][0] in result.output
+        assert str(top_k_return_value[0][1]) in result.output
+        assert str(top_k_return_value[1][0]) in result.output
+        assert str(top_k_return_value[1][1]) in result.output
 
 
 @patch('src.package_statistics.download_file')
@@ -34,14 +34,18 @@ def test_package_statistics_downloading_when_not_available(mock_isfile, mock_dow
     mock_download_file.return_value = True
 
     with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
-        mock_top_k_packages_max_files.return_value = [('package1', 2), ('package2', 1)]
+        top_k_return_value = [('package1', 2), ('package2', 1)]
+        mock_top_k_packages_max_files.return_value = top_k_return_value
         runner = CliRunner()
         result = runner.invoke(package_statistics.package_statistics, ['arm64', '--force=false'])
         mock_download_file.assert_called_once()
         mock_top_k_packages_max_files.assert_called_once_with(K_VALUE)
         assert result.exit_code == 0
         assert "Downloading" in result.output
-        assert '1. package1' in result.output
+        assert top_k_return_value[0][0] in result.output
+        assert str(top_k_return_value[0][1]) in result.output
+        assert str(top_k_return_value[1][0]) in result.output
+        assert str(top_k_return_value[1][1]) in result.output
 
 
 @patch('src.package_statistics.download_file')
@@ -52,14 +56,18 @@ def test_package_statistics_force_downloading_when_available_success(mock_isfile
     mock_download_file.return_value = True
 
     with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
-        mock_top_k_packages_max_files.return_value = [('package1', 2), ('package2', 1)]
+        top_k_return_value = [('package1', 2), ('package2', 1)]
+        mock_top_k_packages_max_files.return_value = top_k_return_value
         runner = CliRunner()
         result = runner.invoke(package_statistics.package_statistics, ['arm64', '--force=true'])
         mock_download_file.assert_called_once()
         mock_top_k_packages_max_files.assert_called_once_with(K_VALUE)
         assert result.exit_code == 0
         assert "Downloading" in result.output
-        assert '1. package1' in result.output
+        assert top_k_return_value[0][0] in result.output
+        assert str(top_k_return_value[0][1]) in result.output
+        assert str(top_k_return_value[1][0]) in result.output
+        assert str(top_k_return_value[1][1]) in result.output
 
 
 def test_package_statistics_no_architecture():
