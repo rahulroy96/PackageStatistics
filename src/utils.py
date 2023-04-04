@@ -4,9 +4,10 @@ import os
 import requests
 import shutil
 import gzip
+from tqdm import tqdm
 
 
-def download_file(file_url: str, file_name: str, chunk_size=1024 * 1024):
+def download_file(file_url: str, file_name: str, chunk_size=1024*1024) -> bool:
     """
     Downloads the file from the given url and saves it to the path.
 
@@ -15,28 +16,20 @@ def download_file(file_url: str, file_name: str, chunk_size=1024 * 1024):
     :param chunk_size: The chunk_size in bytes that should be used while downloading.
     :return: True if file was successfully downloaded false otherwise
     """
-    try:
 
-        with requests.get(file_url, stream=True) as r:  # Send a GET request to the URL with streaming enabled
-            r.raise_for_status()  # Raise an exception if the response has an error status code
-            with open(file_name, "wb") as f:  # Open the file in binary mode for writing
-                for chunk in r.iter_content(chunk_size=chunk_size):  # Iterate over the response content in chunks
-                    f.write(chunk)  # Write each chunk to the file
-
-    except requests.exceptions.HTTPError as e:  # Raised when there is 4xx or 5xx return status code
-        print(f"Exception while downloading the file, please check your url  - {file_url}")
-        print(f"Exception - {e}")
-        raise
-    except requests.exceptions.ConnectionError as e:  # Raised when there is a network problem
-        print(e)
-        raise
-    else:
-        print(f"Downloaded {file_name} successfully.")
+    with requests.get(file_url, stream=True) as r:  # Send a GET request to the URL with streaming enabled
+        r.raise_for_status()  # Raise an exception if the response has an error status code
+        total_size_in_bytes = int(r.headers.get('content-length', 0))
+        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+        with open(file_name, "wb") as f:  # Open the file in binary mode for writing
+            for chunk in r.iter_content(chunk_size=chunk_size):  # Iterate over the response content in chunks
+                progress_bar.update(len(chunk))
+                f.write(chunk)  # Write each chunk to the file
 
     return os.path.isfile(file_name)  # Returns true if the file was downloaded successfully
 
 
-def unzip_gz_file(gz_file_path, output_file):
+def unzip_gz_file(gz_file_path: str, output_file: str) -> bool:
     """
     Unzips the gzip file to the specified directory
     :param gz_file_path: The path to the file which is to be unzipped
