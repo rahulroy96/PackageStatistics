@@ -39,7 +39,7 @@ def test_download_file_error():
     with pytest.raises(requests.RequestException):
         # Call the download_file() function with a URL and file name
         _ = download_file(INVALID_URL, GZ_FILE_NAME)
-        assert os.path.isfile(GZ_FILE_NAME), False
+        assert os.path.isfile(GZ_FILE_NAME) is False
 
 
 @patch('gzip.open', mock_open(read_data=FILE_CONTENT))
@@ -68,7 +68,7 @@ def test_unzip_gz_file_not_gz_input_exception(mock_isfile):
     with pytest.raises(ValueError):
         # Call the unzip_gz_file with GZ_FILE_NAME and FILE_NAME
         _ = unzip_gz_file(FILE_NAME, FILE_NAME)
-        assert os.path.isfile(FILE_NAME), False
+        assert os.path.isfile(FILE_NAME) is False
 
 
 @patch('gzip.open', mock_open(read_data=FILE_CONTENT))
@@ -80,4 +80,4 @@ def test_unzip_gz_file_input_file_not_exists_exception(mock_isfile):
     with pytest.raises(FileNotFoundError):
         # Call the unzip_gz_file with GZ_FILE_NAME and FILE_NAME
         _ = unzip_gz_file(GZ_FILE_NAME, FILE_NAME)
-        assert os.path.isfile(FILE_NAME), False
+        assert os.path.isfile(FILE_NAME) is False

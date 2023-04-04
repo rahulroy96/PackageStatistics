@@ -3,7 +3,7 @@ an argument, downloads the compressed Contents file associated with
 it parse the file and output the statistics of the top 10 packages
 that have the most files associated with them"""
 import sys
-
+import shutil
 import click
 import os
 from utils import download_file
@@ -13,12 +13,13 @@ from requests.exceptions import HTTPError, ConnectionError
 
 
 @click.command()
+@click.option('--no_cache', default=True, help='If set to true, the downloaded files are not deleted.')
 @click.option('--debug', default=False, help='Print the exception to the console for more info.')
 @click.option('--force', default=False, help='Force download the content file even if it exists locally')
 @click.option('--table_header', default=False,
               help='Specifies if the table structure of the contents file has a header')
 @click.argument('architecture')
-def package_statistics(architecture, table_header, force, debug):
+def package_statistics(architecture, table_header, force, debug, no_cache):
     try:
         # Check if the download folder exists and c
         if not os.path.exists(DOWNLOAD_FOLDER):
@@ -55,6 +56,10 @@ def package_statistics(architecture, table_header, force, debug):
         if debug:
             click.echo(e)
         sys.exit(1)
+
+    finally:
+        if no_cache:
+            shutil.rmtree(DOWNLOAD_FOLDER)
 
 
 if __name__ == '__main__':

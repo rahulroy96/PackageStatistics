@@ -1,6 +1,8 @@
+import os.path
+
 from click.testing import CliRunner
 from unittest.mock import patch
-from src.constants import K_VALUE
+from src.constants import K_VALUE, DOWNLOAD_FOLDER
 from requests.exceptions import HTTPError, ConnectionError
 
 
@@ -68,6 +70,52 @@ def test_package_statistics_force_downloading_when_available_success(mock_isfile
         assert str(top_k_return_value[0][1]) in result.output
         assert str(top_k_return_value[1][0]) in result.output
         assert str(top_k_return_value[1][1]) in result.output
+
+
+@patch('src.package_statistics.download_file')
+@patch('os.path.isfile')
+def test_package_statistics_delete_file_after_success(mock_isfile, mock_download_file):
+    from src import package_statistics
+    mock_isfile.return_value = True
+    mock_download_file.return_value = True
+
+    with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
+        top_k_return_value = [('package1', 2), ('package2', 1)]
+        mock_top_k_packages_max_files.return_value = top_k_return_value
+        runner = CliRunner()
+        result = runner.invoke(package_statistics.package_statistics, ['arm64', '--force=true', '--no_cache=true'])
+        mock_download_file.assert_called_once()
+        mock_top_k_packages_max_files.assert_called_once_with(K_VALUE)
+        assert result.exit_code == 0
+        assert "Downloading" in result.output
+        assert top_k_return_value[0][0] in result.output
+        assert str(top_k_return_value[0][1]) in result.output
+        assert str(top_k_return_value[1][0]) in result.output
+        assert str(top_k_return_value[1][1]) in result.output
+        assert os.path.exists(DOWNLOAD_FOLDER) is False
+
+
+@patch('src.package_statistics.download_file')
+@patch('os.path.isfile')
+def test_package_statistics_no_delete_file_after_success(mock_isfile, mock_download_file):
+    from src import package_statistics
+    mock_isfile.return_value = True
+    mock_download_file.return_value = True
+
+    with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
+        top_k_return_value = [('package1', 2), ('package2', 1)]
+        mock_top_k_packages_max_files.return_value = top_k_return_value
+        runner = CliRunner()
+        result = runner.invoke(package_statistics.package_statistics, ['arm64', '--force=true', '--no_cache=false'])
+        mock_download_file.assert_called_once()
+        mock_top_k_packages_max_files.assert_called_once_with(K_VALUE)
+        assert result.exit_code == 0
+        assert "Downloading" in result.output
+        assert top_k_return_value[0][0] in result.output
+        assert str(top_k_return_value[0][1]) in result.output
+        assert str(top_k_return_value[1][0]) in result.output
+        assert str(top_k_return_value[1][1]) in result.output
+        assert os.path.exists(DOWNLOAD_FOLDER) is True
 
 
 def test_package_statistics_no_architecture():
