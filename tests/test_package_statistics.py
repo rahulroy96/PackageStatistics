@@ -1,5 +1,4 @@
 from click.testing import CliRunner
-from unittest import mock
 from unittest.mock import patch
 from src.constants import K_VALUE
 from requests.exceptions import HTTPError, ConnectionError
@@ -93,3 +92,18 @@ def test_package_statistics_invalid_architecture(mock_isfile, mock_download_file
     result = runner.invoke(package_statistics.package_statistics, ['ar'])
     assert result.exit_code == 1
     assert "Couldn't connect to the server!! Please check your network connection" in result.output
+
+
+@patch('src.package_statistics.download_file')
+@patch('os.path.isfile')
+def test_package_statistics_invalid_content_file_format_exception(mock_isfile, mock_download_file):
+    from src import package_statistics
+    mock_isfile.return_value = True
+    mock_download_file.return_value = True
+
+    with patch.object(package_statistics.ContentsParser, 'top_k_packages_max_files') as mock_top_k_packages_max_files:
+        mock_top_k_packages_max_files.side_effect = package_statistics.InvalidContentFileFormat()
+        runner = CliRunner()
+        result = runner.invoke(package_statistics.package_statistics, ['arm64', '--force=true'])
+        assert result.exit_code == 1
+        assert "Invalid contents File format! Table header(FILE LOCATION) not found" in result.output

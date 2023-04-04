@@ -49,7 +49,7 @@ class ContentsParser:
 
         if self.table_header and not table_started:
             # The table header containing FILE LOCATION was not detected in the file even though table header exists
-            raise InvalidContentFileFormat("Invalid contents File format! Table header(FILE LOCATION) not found")
+            raise InvalidContentFileFormat
 
         return files_list_per_package
 

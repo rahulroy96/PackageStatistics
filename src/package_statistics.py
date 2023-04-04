@@ -8,7 +8,7 @@ import click
 import os
 from utils import download_file
 from constants import DOWNLOAD_FOLDER, URL_BASE, CHUNK_SIZE, FILE_NAME_FORMAT, K_VALUE
-from contents_parser import ContentsParser
+from contents_parser import ContentsParser, InvalidContentFileFormat
 from requests.exceptions import HTTPError, ConnectionError
 
 
@@ -46,6 +46,12 @@ def package_statistics(architecture, table_header, force, debug):
         sys.exit(1)
     except ConnectionError as e:
         click.echo("\nError: Couldn't connect to the server!! Please check your network connection")
+        if debug:
+            click.echo(e)
+        sys.exit(1)
+    except InvalidContentFileFormat as e:
+        click.echo("\nError: Invalid contents File format! Table header(FILE LOCATION) not found. "
+                   "Try using --table_header=false if the contents file is not expected to have a table header.")
         if debug:
             click.echo(e)
         sys.exit(1)
