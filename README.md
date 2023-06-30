@@ -1,4 +1,4 @@
-Task
+## Task
 ****
 The task is to develop a python command line tool that takes the architecture as
 an argument and downloads the compressed Contents file associated with
@@ -6,7 +6,7 @@ it from a Debian mirror. The program should parse the file and output the statis
 of the top 10 packages that have the most files associated with them.
 
 
-Initial thoughts
+## Initial thoughts
 ****************
 Below are my initial thoughts on how to approach the problem, there may be changes
 when starting to implement
@@ -37,7 +37,7 @@ when starting to implement
           and not sorting the entire list which has n log(n) complexity.
 
 
-Implementation
+## Implementation
 **************
 I have used the below folder structure for this task
 package_statistics
@@ -74,7 +74,7 @@ user to force download the contents file and not use the local copy and the --no
 after execution and not save locally.
 
 
-Usage
+## Usage
 *****
 python src/package_statistics package_name [options]
 
@@ -89,7 +89,7 @@ options description
 --debug=[true|false] - If set to true, the exception traceback will be output to the console. Default is false.
 
 
-Main components
+## Main components
 ***************
 ContentsParser - The class takes as argument the path of a contents file. It has 2 methods, first is
 get_files_list_per_package method will return a dictionary of packageName -> list of files associated with tha package.
